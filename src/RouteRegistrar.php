@@ -55,23 +55,38 @@ class RouteRegistrar
                 $method->getAttributes(Put::class),
                 $method->getAttributes(Patch::class),
                 $method->getAttributes(Delete::class),
-                $method->getAttributes(Any::class),
+                $method->getAttributes(Any::class)
             );
 
             foreach ($methodAttributes as $attr) {
                 $instance = $attr->newInstance();
                 $httpMethod = strtolower((new ReflectionClass($attr->getName()))->getShortName());
 
+                // === توليد URI ===
                 if ($instance->onController) {
                     $controllerSegment = strtolower(str_replace('Controller', '', $reflection->getShortName()));
                     $methodSegment = strtolower($method->getName());
+
+                    // فقط الباراميترات scalar
+                    $params = array_filter(
+                        $method->getParameters(),
+                        fn($p) => !$p->getType() || $p->getType()->isBuiltin()
+                    );
+
+                    $paramSegments = array_map(fn($p) => '{'.$p->getName().'}', $params);
+
                     $uri = $controllerSegment . '/' . $methodSegment;
-                    $params = array_map(fn($p) => '{'.$p->getName().'}', $method->getParameters());
-                    if ($params) $uri .= '/' . implode('/', $params);
+                    if ($paramSegments) $uri .= '/' . implode('/', $paramSegments);
                 } else {
                     $uri = $instance->uri ?? strtolower($method->getName());
-                    $params = array_map(fn($p) => '{'.$p->getName().'}', $method->getParameters());
-                    foreach ($params as $param) {
+
+                    $params = array_filter(
+                        $method->getParameters(),
+                        fn($p) => !$p->getType() || $p->getType()->isBuiltin()
+                    );
+                    $paramSegments = array_map(fn($p) => '{'.$p->getName().'}', $params);
+
+                    foreach ($paramSegments as $param) {
                         if (!str_contains($uri, $param)) $uri .= '/' . $param;
                     }
                 }
@@ -130,23 +145,36 @@ class RouteRegistrar
                 $method->getAttributes(Put::class),
                 $method->getAttributes(Patch::class),
                 $method->getAttributes(Delete::class),
-                $method->getAttributes(Any::class),
+                $method->getAttributes(Any::class)
             );
 
             foreach ($methodAttributes as $attr) {
                 $instance = $attr->newInstance();
-                $httpMethod = strtoupper((new \ReflectionClass($attr->getName()))->getShortName());
+                $httpMethod = strtoupper((new ReflectionClass($attr->getName()))->getShortName());
 
                 if ($instance->onController) {
                     $controllerSegment = strtolower(str_replace('Controller', '', $reflection->getShortName()));
                     $methodSegment = strtolower($method->getName());
+
+                    $params = array_filter(
+                        $method->getParameters(),
+                        fn($p) => !$p->getType() || $p->getType()->isBuiltin()
+                    );
+
+                    $paramSegments = array_map(fn($p) => '{'.$p->getName().'}', $params);
+
                     $uri = $controllerSegment . '/' . $methodSegment;
-                    $params = array_map(fn($p) => '{'.$p->getName().'}', $method->getParameters());
-                    if ($params) $uri .= '/' . implode('/', $params);
+                    if ($paramSegments) $uri .= '/' . implode('/', $paramSegments);
                 } else {
                     $uri = $instance->uri ?? strtolower($method->getName());
-                    $params = array_map(fn($p) => '{'.$p->getName().'}', $method->getParameters());
-                    foreach ($params as $param) {
+
+                    $params = array_filter(
+                        $method->getParameters(),
+                        fn($p) => !$p->getType() || $p->getType()->isBuiltin()
+                    );
+
+                    $paramSegments = array_map(fn($p) => '{'.$p->getName().'}', $params);
+                    foreach ($paramSegments as $param) {
                         if (!str_contains($uri, $param)) $uri .= '/' . $param;
                     }
                 }
