@@ -151,7 +151,7 @@ bootstrap/
 └─ cache/
    └─ routes-v7.php
 config/
-└─ easyroute.php
+└─ route-attribute.php
 ```
 
 ✅ Notes for Developers
