@@ -62,12 +62,10 @@ class RouteRegistrar
                 $instance = $attr->newInstance();
                 $httpMethod = strtolower((new ReflectionClass($attr->getName()))->getShortName());
 
-                // === توليد URI ===
                 if ($instance->onController) {
                     $controllerSegment = strtolower(str_replace('Controller', '', $reflection->getShortName()));
                     $methodSegment = strtolower($method->getName());
 
-                    // فقط الباراميترات scalar
                     $params = array_filter(
                         $method->getParameters(),
                         fn($p) => !$p->getType() || $p->getType()->isBuiltin()
